@@ -1,0 +1,223 @@
+,,,
+,QUESTION 1,,SELECT distinct CategoryID FROM `expense-analysis-bigquery.Expenses.data` 
+,,,
+,QUESTION 2,,SELECT max(Cost) FROM `expense-analysis-bigquery.Expenses.data`
+,,,
+,QUESTION 3,,"SELECT * FROM `expense-analysis-bigquery.Expenses.data` 
+limit 20"
+,,,
+,,,
+,,,
+,QUESTION 4,,SELECT distinct Company FROM `expense-analysis-bigquery.Expenses.data`
+,,,
+,QUESTION 5,,"SELECT extract(month from date),count(distinct date)
+FROM `expense-analysis-bigquery.Expenses.data` 
+group by extract(month from date)"
+,,,
+,QUESTION 6,,"SELECT extract(month from date),count(distinct date)"
+,,,FROM `expense-analysis-bigquery.Expenses.data`
+,,,group by extract(month from date)
+,,,order by count(distinct date) desc
+,,,
+,QUESTION 7,,SELECT * FROM `expense-analysis-bigquery.Expenses.data`
+,,,"where categoryid in (3,4)"
+,,,
+,QUESTION 8,,"SELECT categoryID,sum(cost) 
+FROM `expense-analysis-bigquery.Expenses.data` 
+where extract(month from date)=3
+group by categoryId
+order by sum(Cost) desc"
+,,,
+,QUESTION 9,,"SELECT company,sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data`
+,,,where extract(month from date)=5
+,,,group by company
+,,,order by sum(cost) desc
+,,,
+,QUESTION 10,,"SELECT b.category,sum(a.cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where extract(month from date)=2
+,,,group by b.category
+,,,
+,QUESTION 11,,SELECT *
+,,,FROM `expense-analysis-bigquery.Expenses.data`
+,,,where company like '%w%'
+,,,
+,,,
+,QUESTION 12,,"SELECT a.*,b.*"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,
+,QUESTION 13,,"SELECT a.*,b.*"
+,,,FROM `expense-analysis-bigquery.Expenses.category` as a
+,,,left join `expense-analysis-bigquery.Expenses.data` as b
+,,,on a.categoryid=b.categoryid
+,,,where b.Date is null
+,,,
+,QUESTION 14,,"SELECT b.category,sum(a.cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,left join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where extract(month from date)=4
+,,,group by b.category
+,,,having sum(a.cost)>150
+,,,
+,,,
+,QUESTION 15,,"SELECT extract(month from date),sum(a.cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where b.category='Ticket'
+,,,group by extract(month from date)
+,,,
+,QUESTION 16,,"SELECT company,count(distinct date)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where b.category='Restaurant'
+,,,group by company
+,,,order by count(distinct date) desc
+,,,
+,QUESTION 17,,SELECT sum(cost)/count(date)
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where b.category='Restaurant'
+,,,
+,QUESTION 18,,SELECT
+,,,"FORMAT_DATE('%A', date),sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where extract(month from date)=5
+,,,"group by FORMAT_DATE('%A', date)"
+,,,
+,QUESTION 19,,SELECT
+,,,"FORMAT_DATE('%Y-%m', date),sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where b.category='Grocery'
+,,,"group by FORMAT_DATE('%Y-%m', date)"
+,,,
+,QUESTION 20,,SELECT
+,,,"company,"
+,,,sum(cost)
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where company like 'R%'
+,,,group by company
+,,,
+,QUESTION 21,,SELECT
+,,,distinct company
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,join `expense-analysis-bigquery.Expenses.category` as b
+,,,on a.categoryid=b.categoryid
+,,,where b.category='Shopping'
+,,,
+,QUESTION 22,,SELECT
+,,,"company,"
+,,,"FORMAT_DATE('%Y-%m', date),sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where company='Rewe'
+,,,"group by company,FORMAT_DATE('%Y-%m', date)"
+,,,
+,QUESTION 23,,SELECT
+,,,"company,"
+,,,"FORMAT_DATE('%Y-%m', date),sum(cost),count(distinct date)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where company='Dominos'
+,,,"group by company,FORMAT_DATE('%Y-%m', date)"
+,,,
+,QUESTION 24,,"SELECT
+FORMAT_DATE('%Y-%m', date),sum(cost)
+FROM `expense-analysis-bigquery.Expenses.data` as a
+join `expense-analysis-bigquery.Expenses.category` as b
+on a.categoryid=b.categoryid
+where b.category='Grocery'
+group by FORMAT_DATE('%Y-%m', date)"
+,,,
+,,,
+,QUESTION 25,,with datanew as (
+,,,SELECT
+,,,"categoryid,Company,sum(cost) as totalcost"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where extract(month from date)=4
+,,,"group by categoryid,Company)"
+,,,"select company,categoryid,rank() over (partition by categoryid order by totalcost desc) as ranking"
+,,,from datanew
+,,,qualify ranking=1
+,,,
+,,,
+,QUESTION 26,,with final2 as (
+,,,with final as (
+,,,select
+,,,"format_Date('%Y-%m',date) as yearmonth"
+,,,",sum(cost) as totalcost"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,"group by format_Date('%Y-%m',date))"
+,,,"select yearmonth,totalcost,lag(totalcost) over (order by yearmonth) as previousmonthcost"
+,,,from final)
+,,,"select yearmonth,totalcost,previousmonthcost,((totalcost-previousmonthcost)/previousmonthcost)*100"
+,,,from final2
+,,,order by yearmonth
+,,,
+,QUESTION 27,,with final2 as (
+,,,with final as (
+,,,select
+,,,"format_Date('%Y-%m',date) as yearmonth"
+,,,",sum(cost) as totalcost"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where categoryid=4
+,,,"group by format_Date('%Y-%m',date))"
+,,,"select yearmonth,totalcost,lag(totalcost) over (order by yearmonth) as previousmonthcost"
+,,,from final)
+,,,"select yearmonth,totalcost,previousmonthcost,((totalcost-previousmonthcost)/previousmonthcost)*100"
+,,,from final2
+,,,order by yearmonth
+,,,
+,,,
+,QUESTION 28,,"select date,count(distinct categoryid)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,group by date
+,,,order by count(distinct categoryid) desc
+,,,
+,QUESTION 29,,"select case when company='Jaipur' then 'indian' else 'nonindian' end as restauranttype,"
+,,,sum(cost)
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where extract(month from date)=6
+,,,and categoryid=4
+,,,group by restauranttype
+,,,
+,QUESTION 30,,"select sum(if(categoryid=4,cost,0))/sum(if(categoryid=2,cost,0))"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where extract(month from date)=4
+,,,
+,,,
+,QUESTION 31,,"select company,extract(month from date),sum(cost)/count(distinct date)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where company='Inter Store'
+,,,"group by 1,2"
+,,,
+,QUESTION 32,,"select company,sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where categoryid=8
+,,,group by 1
+,,,
+,QUESTION 33,,"select company,sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where company='Kebab Shop'
+,,,group by Company
+,,,
+,,,union all
+,,,
+,,,"select company,sum(cost)"
+,,,FROM `expense-analysis-bigquery.Expenses.data` as a
+,,,where company='Panda'
+,,,group by Company
+,,,
+,QUESTION 34,,with cte as (
+,,,"select *,"
+,,,"row_number() over (partition by date,company,categoryid,cost) as rownumber"
+,,,FROM `expense-analysis-bigquery.Expenses.data` )
+,,,select * from cte where rownumber>1
